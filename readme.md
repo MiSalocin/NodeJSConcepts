@@ -1,3 +1,5 @@
+# Node JS - First challange
+## this is the first challange from RocketSeat classes
 **REQUIREMENTS**
 - [X] Should be able to create a new user
 - [X] Should be able to list all user's todos
