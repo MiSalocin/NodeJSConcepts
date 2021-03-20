@@ -25,38 +25,41 @@ app.post('/users', (request, response) => {
   const { name, username } = request.body;
   const userExists = users.some((user) => user.username === username)
 
-  if (userExists)
+  if (userExists) {
     return response.status(400).json({ error: "User already exists" });
+  }
 
-  users.push({
+  const user = {
     id: uuidv4(),
     name: name,
     username: username,
     todos: []
-  })
+  }
+  users.push(user)
 
-  return response.status(201).json({ Message: "User created successfully" })
+  return response.status(201).json(user)
 });
 
 app.get('/todos', checksExistsUserAccount, (request, response) => {
   const { user } = request;
 
-  return response.status(200).json({ TODOS: user.todos })
+  return response.json(user.todos);
 });
 
 app.post('/todos', checksExistsUserAccount, (request, response) => {
   const { title, deadline } = request.body;
   const { user } = request;
 
-  user.todos.push({
+  const todos = {
     id: uuidv4(),
     title: title,
     done: false,
     deadline: new Date(deadline),
     created_at: new Date()
-  });
+  };
 
-  return response.status(201).json({ message: "Todo created" })
+  user.todos.push(todos);
+  return response.status(201).send(todos);
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
@@ -73,7 +76,7 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   todo.title = title;
   todo.deadline = new Date(deadline);
 
-  return response.status(202).json({ Message: "Todo Updated" });
+  return response.status(202).json(todo);
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
@@ -88,7 +91,7 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
 
   todo.done = true;
 
-  return response.status(202).json({ Message: "Todo marked as complete" });
+  return response.status(202).json(todo);
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
@@ -99,11 +102,10 @@ app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
 
   if (todoIndex === -1) {
     return response.status(404).json({ error: "Todo not found" })
-  } else {
-    user.todos.splice(todoIndex, 1)
   }
+  user.todos.splice(todoIndex, 1)
 
-  return response.status(204);
+  return response.status(204).json();
 });
 
 module.exports = app;
